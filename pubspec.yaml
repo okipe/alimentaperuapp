@@ -1,0 +1,40 @@
+name: alimenta_peru
+description: Aplicación de gestión alimentaria - Alimenta Perú
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Arquitectura y estado
+  provider: ^6.1.1
+
+  # Firebase
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
+
+  # UI
+  google_fonts: ^6.2.1
+  qr_flutter: ^4.1.0
+
+  # PDF y reportes
+  pdf: ^3.10.8
+  printing: ^5.12.0
+
+  # Utilidades
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,40 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - lib/firebase_options.dart
+  errors:
+    # Trata los warnings de tipo como errores
+    invalid_assignment: error
+    missing_return: error
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # Estilo
+    prefer_single_quotes: true
+    always_use_package_imports: true
+    directives_ordering: true
+    sort_child_properties_last: true
+
+    # Dart moderno
+    prefer_const_constructors: true
+    prefer_const_declarations: true
+    use_super_parameters: true
+    prefer_final_locals: true
+
+    # Calidad
+    avoid_print: true
+    avoid_empty_else: true
+    avoid_unnecessary_containers: true
+    sized_box_for_whitespace: true
+    use_key_in_widget_constructors: true
+
+    # Flutter
+    prefer_const_constructors_in_immutables: true
+    prefer_const_literals_to_create_immutables: true

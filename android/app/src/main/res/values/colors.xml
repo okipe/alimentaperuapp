@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Color principal para notificaciones FCM -->
+    <color name="notification_color">#16A34A</color>
+
+    <!-- Color de la SplashScreen / LaunchTheme -->
+    <color name="launch_background">#16A34A</color>
+</resources>
