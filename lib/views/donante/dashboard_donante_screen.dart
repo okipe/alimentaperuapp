@@ -7,6 +7,7 @@ import '../../core/constants/app_styles.dart';
 import '../../viewmodels/auth_viewmodel.dart';
 import '../../viewmodels/donacion_viewmodel.dart';
 import '../../app/routes.dart';
+import '../../core/enums/enums.dart';
 
 class DashboardDonanteScreen extends StatefulWidget {
   const DashboardDonanteScreen({super.key});

@@ -15,7 +15,7 @@ import 'viewmodels/reporte_viewmodel.dart';
 
 // NOTA: Descomenta la siguiente línea una vez que hayas ejecutado
 // "flutterfire configure" y generado el archivo firebase_options.dart real.
-// import 'firebase_options.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +30,7 @@ void main() async {
   // NOTA: Reemplaza por DefaultFirebaseOptions.currentPlatform cuando
   // tengas configurado firebase_options.dart con flutterfire configure.
   await Firebase.initializeApp(
-    // options: DefaultFirebaseOptions.currentPlatform,
+  options: DefaultFirebaseOptions.currentPlatform,
   );
 
   runApp(

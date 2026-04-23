@@ -30,6 +30,8 @@ abstract final class AppStyles {
       BorderRadius.all(Radius.circular(radiusL));
   static const BorderRadius borderRadiusXL =
       BorderRadius.all(Radius.circular(radiusXL));
+  static const BorderRadius borderRadiusFull =
+    BorderRadius.all(Radius.circular(radiusFull));
 
   // ── Elevaciones ──────────────────────────────────────────────────────────
   static const double elevationNone = 0;
