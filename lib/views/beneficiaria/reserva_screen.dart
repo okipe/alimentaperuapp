@@ -1,13 +1,12 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/racion_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/reserva_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../viewmodels/reserva_viewmodel.dart';
-import '../../viewmodels/racion_viewmodel.dart';
 
 class ReservaScreen extends StatefulWidget {
   const ReservaScreen({super.key});
@@ -18,7 +17,7 @@ class ReservaScreen extends StatefulWidget {
 
 class _ReservaScreenState extends State<ReservaScreen> {
   bool _reservaCreada = false;
-  String? _reservaId;
+  String? _codigoQR;
 
   Future<void> _onReservar() async {
     final authVM = context.read<AuthViewModel>();
@@ -26,7 +25,6 @@ class _ReservaScreenState extends State<ReservaScreen> {
     final reservaVM = context.read<ReservaViewModel>();
 
     final uid = authVM.currentUser?.uid;
-    final nombre = authVM.currentUser?.displayName ?? 'Beneficiaria';
     final racion = racionVM.racionDelDia;
 
     if (uid == null || racion == null) {
@@ -37,16 +35,17 @@ class _ReservaScreenState extends State<ReservaScreen> {
     }
 
     final ok = await reservaVM.crearReserva(
-      usuarioId: uid,
-      racionId: racion.id,
-      nombreUsuario: nombre,
+      beneficiariaId: uid,
+      menuId: racion.id,
+      comedorId: '', // TODO: obtener del perfil de la beneficiaria
+      turno: 'mañana', // TODO: permitir que la usuaria elija su turno
     );
 
     if (!mounted) return;
     if (ok) {
       setState(() {
         _reservaCreada = true;
-        _reservaId = reservaVM.reservaActiva?.id ?? uid;
+        _codigoQR = reservaVM.reservaActiva?.codigoQR ?? uid;
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -156,7 +155,7 @@ class _ReservaScreenState extends State<ReservaScreen> {
               padding: const EdgeInsets.all(AppStyles.spacingM),
               decoration: AppStyles.cardDecoration,
               child: QrImageView(
-                data: _reservaId ?? 'reserva-sin-id',
+                data: _codigoQR ?? 'reserva-sin-id',
                 version: QrVersions.auto,
                 size: 200,
                 eyeStyle: const QrEyeStyle(
@@ -188,8 +187,8 @@ class _ReservaScreenState extends State<ReservaScreen> {
         children: [
           Text(label, style: AppStyles.bodyMedium),
           Text(valor,
-              style: AppStyles.bodyLarge
-                  .copyWith(fontWeight: FontWeight.w600)),
+              style:
+                  AppStyles.bodyLarge.copyWith(fontWeight: FontWeight.w600)),
         ],
       ),
     );

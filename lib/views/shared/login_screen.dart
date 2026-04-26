@@ -1,12 +1,11 @@
+import 'package:alimenta_peru/app/routes.dart';
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../core/enums/enums.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../app/routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -69,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   width: 80,
                   height: 80,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: AppColors.successGreen,
                     borderRadius: AppStyles.borderRadiusXL,
                   ),
@@ -97,10 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: AppStrings.emailLabel,
                         hintText: AppStrings.emailHint,
-                        prefixIcon: const Icon(Icons.email_outlined),
+                        prefixIcon: Icon(Icons.email_outlined),
                       ),
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
@@ -161,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Colors.white,
                               ),
                             )
-                          : Text(AppStrings.login),
+                          : const Text(AppStrings.login),
                     ),
                     const SizedBox(height: AppStyles.spacingM),
                     Row(

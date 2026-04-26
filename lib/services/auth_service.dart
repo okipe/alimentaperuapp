@@ -1,14 +1,17 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/administradora_model.dart';
+import 'package:alimenta_peru/models/beneficiaria_model.dart';
+import 'package:alimenta_peru/models/donante_model.dart';
+import 'package:alimenta_peru/models/usuario_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../core/enums/enums.dart';
-import '../models/usuario_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 /// Servicio de autenticación Firebase.
 ///
 /// Abstrae las llamadas directas al SDK de FirebaseAuth y Firestore.
-/// Los ViewModels consumen este servicio en lugar de invocar Firebase directamente,
-/// manteniendo la lógica de infraestructura fuera de la capa de presentación.
+/// Los ViewModels consumen este servicio en lugar de invocar Firebase
+/// directamente, manteniendo la lógica de infraestructura fuera de la
+/// capa de presentación.
 class AuthService {
   final FirebaseAuth _auth;
   final FirebaseFirestore _db;
@@ -34,28 +37,30 @@ class AuthService {
       );
 
   // ── Registro ─────────────────────────────────────────────────────────────
+  /// Crea la cuenta en Firebase Auth y el perfil en Firestore.
+  ///
+  /// El [nombre] se mapea al campo `nombre` del modelo.
+  /// El `dni` queda vacío por defecto y el usuario lo completa más tarde
+  /// en la pantalla de perfil.
   Future<UsuarioModel> registerWithEmail({
     required String email,
     required String password,
-    required String nombreCompleto,
+    required String nombre,
     required RolUsuario rol,
   }) async {
     final cred = await _auth.createUserWithEmailAndPassword(
       email: email.trim(),
       password: password,
     );
-    await cred.user!.updateDisplayName(nombreCompleto);
+    await cred.user!.updateDisplayName(nombre);
 
-    final usuario = UsuarioModel(
-      id: cred.user!.uid,
-      nombreCompleto: nombreCompleto,
+    final usuario = _crearUsuarioBase(
+      uid: cred.user!.uid,
+      nombre: nombre,
       email: email.trim(),
       rol: rol,
-      estado: EstadoUsuario.activo,
-      fechaRegistro: DateTime.now(),
     );
 
-    // Guardar perfil en Firestore
     await _db
         .collection('usuarios')
         .doc(cred.user!.uid)
@@ -75,13 +80,13 @@ class AuthService {
   Future<UsuarioModel?> fetchUsuarioPerfil(String uid) async {
     final snap = await _db.collection('usuarios').doc(uid).get();
     if (!snap.exists) return null;
-    return UsuarioModel.fromFirestore(snap);
+    return _usuarioFromSnapshot(snap);
   }
 
   Stream<UsuarioModel?> usuarioStream(String uid) {
     return _db.collection('usuarios').doc(uid).snapshots().map((snap) {
       if (!snap.exists) return null;
-      return UsuarioModel.fromFirestore(snap);
+      return _usuarioFromSnapshot(snap);
     });
   }
 
@@ -98,5 +103,69 @@ class AuthService {
     await _db.collection('usuarios').doc(uid).update({
       'estado': nuevoEstado.name,
     });
+  }
+
+  // ── Helpers privados ──────────────────────────────────────────────────────
+
+  /// Crea la subclase correcta de [UsuarioModel] según el rol.
+  /// Los campos específicos del perfil (comedorId, dni, etc.) se completan
+  /// con valores vacíos y el usuario los actualiza en la pantalla de perfil.
+  UsuarioModel _crearUsuarioBase({
+    required String uid,
+    required String nombre,
+    required String email,
+    required RolUsuario rol,
+  }) {
+    final now = DateTime.now();
+    switch (rol) {
+      case RolUsuario.beneficiaria:
+        return BeneficiariaModel(
+          id: uid,
+          nombre: nombre,
+          dni: '',
+          email: email,
+          estado: EstadoUsuario.activo,
+          fechaRegistro: now,
+          comedorId: '',
+          numPersonasFamilia: 1,
+          turnoPreferido: '',
+        );
+      case RolUsuario.administradora:
+        return AdministradoraModel(
+          id: uid,
+          nombre: nombre,
+          dni: '',
+          email: email,
+          estado: EstadoUsuario.activo,
+          fechaRegistro: now,
+          comedorId: '',
+          codigoRegistro: '',
+          verificada: false,
+        );
+      case RolUsuario.donante:
+        return DonanteModel(
+          id: uid,
+          nombre: nombre,
+          dni: '',
+          email: email,
+          estado: EstadoUsuario.activo,
+          fechaRegistro: now,
+        );
+    }
+  }
+
+  /// Despacha la construcción del modelo correcto leyendo el campo `rol`
+  /// del documento de Firestore. Nunca retorna null (fallback: [DonanteModel]).
+  UsuarioModel _usuarioFromSnapshot(DocumentSnapshot snap) {
+    final data = snap.data() as Map<String, dynamic>;
+    final rol = RolUsuarioX.fromString(data['rol'] as String? ?? '');
+    switch (rol) {
+      case RolUsuario.beneficiaria:
+        return BeneficiariaModel.fromFirestore(snap);
+      case RolUsuario.administradora:
+        return AdministradoraModel.fromFirestore(snap);
+      case RolUsuario.donante:
+        return DonanteModel.fromFirestore(snap);
+    }
   }
 }

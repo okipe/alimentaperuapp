@@ -1,14 +1,13 @@
+import 'package:alimenta_peru/app/routes.dart';
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/racion_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/reserva_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../viewmodels/racion_viewmodel.dart';
-import '../../viewmodels/reserva_viewmodel.dart';
-import '../../app/routes.dart';
+import 'package:provider/provider.dart';
 
 class DashboardBeneficiariaScreen extends StatefulWidget {
   const DashboardBeneficiariaScreen({super.key});
@@ -216,11 +215,11 @@ class _DashboardBeneficiariaScreenState
 
   Widget _buildAccesosRapidos(BuildContext context) {
     final opciones = [
-      _Acceso(
+      const _Acceso(
           icon: Icons.bookmark_outlined,
           label: AppStrings.historialReservas,
           route: AppRoutes.historialReserva),
-      _Acceso(
+      const _Acceso(
           icon: Icons.restaurant_menu_outlined,
           label: AppStrings.racionesDisponibles,
           route: AppRoutes.racionDisponible),

@@ -1,10 +1,9 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../viewmodels/auth_viewmodel.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

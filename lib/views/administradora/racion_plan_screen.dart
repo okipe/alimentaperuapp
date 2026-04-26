@@ -1,13 +1,12 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/racion_model.dart';
+import 'package:alimenta_peru/viewmodels/racion_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../core/enums/enums.dart';
-import '../../models/racion_model.dart';
-import '../../viewmodels/racion_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class RacionPlanScreen extends StatefulWidget {
   const RacionPlanScreen({super.key});
@@ -141,10 +140,10 @@ class _RacionCard extends StatelessWidget {
               ),
               PopupMenuButton<EstadoMenu>(
                 onSelected: onCambiarEstado,
-                child: Row(
+                child: const Row(
                   children: [
-                    const Text('Cambiar estado'),
-                    const Icon(Icons.arrow_drop_down),
+                    Text('Cambiar estado'),
+                    Icon(Icons.arrow_drop_down),
                   ],
                 ),
                 itemBuilder: (_) => EstadoMenu.values

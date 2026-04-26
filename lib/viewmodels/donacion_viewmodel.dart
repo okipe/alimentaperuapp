@@ -1,8 +1,7 @@
-import 'package:flutter/foundation.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/donacion_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../core/enums/enums.dart';
-import '../models/donacion_model.dart';
+import 'package:flutter/foundation.dart';
 
 enum DonacionStatus { idle, loading, success, error }
 

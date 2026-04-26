@@ -1,13 +1,12 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/donacion_model.dart';
+import 'package:alimenta_peru/viewmodels/donacion_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../core/enums/enums.dart';
-import '../../models/donacion_model.dart';
-import '../../viewmodels/donacion_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class HistorialDonacionScreen extends StatelessWidget {
   const HistorialDonacionScreen({super.key});
@@ -25,9 +24,7 @@ class HistorialDonacionScreen extends StatelessWidget {
               ? _buildVacio()
               : Column(
                   children: [
-                    // Resumen por tipo
                     _buildResumen(vm),
-                    // Lista
                     Expanded(
                       child: ListView.separated(
                         padding: AppStyles.paddingScreen,
@@ -63,8 +60,8 @@ class HistorialDonacionScreen extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.all(AppStyles.spacingM),
       padding: AppStyles.paddingCard,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
           colors: [AppColors.primaryGreen, Color(0xFF14532D)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -96,7 +93,7 @@ class HistorialDonacionScreen extends StatelessWidget {
             style: AppStyles.headlineMedium.copyWith(color: color)),
         Text(label,
             style: AppStyles.caption.copyWith(
-                color: color.withOpacity(0.8))),
+                color: color.withValues(alpha: 0.8))),
       ],
     );
   }
@@ -108,7 +105,9 @@ class _DonacionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fecha = DateFormat('dd MMM yyyy', 'es').format(donacion.fechaCreacion);
+    // ← fix: donacion.fecha en lugar de donacion.fechaCreacion
+    final fechaStr =
+        DateFormat('dd MMM yyyy', 'es').format(donacion.fecha);
 
     return Container(
       padding: AppStyles.paddingCard,
@@ -118,7 +117,7 @@ class _DonacionCard extends StatelessWidget {
           Container(
             width: 48,
             height: 48,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.successGreen,
               borderRadius: AppStyles.borderRadiusM,
             ),
@@ -137,7 +136,7 @@ class _DonacionCard extends StatelessWidget {
                     style: AppStyles.bodyMedium,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
-                Text(fecha, style: AppStyles.caption),
+                Text(fechaStr, style: AppStyles.caption),
               ],
             ),
           ),
@@ -145,8 +144,8 @@ class _DonacionCard extends StatelessWidget {
             const SizedBox(width: AppStyles.spacingS),
             Text(
               'S/ ${donacion.monto!.toStringAsFixed(2)}',
-              style: AppStyles.titleMedium.copyWith(
-                  color: AppColors.primaryOrange),
+              style: AppStyles.titleMedium
+                  .copyWith(color: AppColors.primaryOrange),
             ),
           ],
         ],

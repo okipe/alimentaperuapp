@@ -2,6 +2,7 @@
 ///
 /// Cada enum incluye una extensión con utilidades de presentación
 /// para no contaminar la UI con lógica de strings.
+library;
 
 // ── Rol de usuario ───────────────────────────────────────────────────────────
 

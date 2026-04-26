@@ -1,27 +1,23 @@
-import 'package:flutter/material.dart';
-
-// Shared Views
-import '../views/shared/splash_screen.dart';
-import '../views/shared/login_screen.dart';
-import '../views/shared/register_screen.dart';
-import '../views/shared/forgot_password_screen.dart';
-
-// Beneficiaria Views
-import '../views/beneficiaria/dashboard_beneficiaria_screen.dart';
-import '../views/beneficiaria/racion_disponible_screen.dart';
-import '../views/beneficiaria/reserva_screen.dart';
-import '../views/beneficiaria/historial_reserva_screen.dart';
-
 // Administradora Views
-import '../views/administradora/dashboard_admin_screen.dart';
-import '../views/administradora/insumo_list_screen.dart';
-import '../views/administradora/racion_plan_screen.dart';
-import '../views/administradora/reporte_screen.dart';
-
+import 'package:alimenta_peru/views/administradora/dashboard_admin_screen.dart';
+import 'package:alimenta_peru/views/administradora/insumo_list_screen.dart';
+import 'package:alimenta_peru/views/administradora/racion_plan_screen.dart';
+import 'package:alimenta_peru/views/administradora/reporte_screen.dart';
+// Beneficiaria Views
+import 'package:alimenta_peru/views/beneficiaria/dashboard_beneficiaria_screen.dart';
+import 'package:alimenta_peru/views/beneficiaria/historial_reserva_screen.dart';
+import 'package:alimenta_peru/views/beneficiaria/racion_disponible_screen.dart';
+import 'package:alimenta_peru/views/beneficiaria/reserva_screen.dart';
 // Donante Views
-import '../views/donante/dashboard_donante_screen.dart';
-import '../views/donante/donacion_screen.dart';
-import '../views/donante/historial_donacion_screen.dart';
+import 'package:alimenta_peru/views/donante/dashboard_donante_screen.dart';
+import 'package:alimenta_peru/views/donante/donacion_screen.dart';
+import 'package:alimenta_peru/views/donante/historial_donacion_screen.dart';
+import 'package:alimenta_peru/views/shared/forgot_password_screen.dart';
+import 'package:alimenta_peru/views/shared/login_screen.dart';
+import 'package:alimenta_peru/views/shared/register_screen.dart';
+// Shared Views
+import 'package:alimenta_peru/views/shared/splash_screen.dart';
+import 'package:flutter/material.dart';
 
 /// Centraliza todas las rutas nombradas de la aplicación.
 class AppRoutes {

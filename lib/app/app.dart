@@ -1,11 +1,7 @@
+import 'package:alimenta_peru/app/routes.dart';
+import 'package:alimenta_peru/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import '../core/constants/app_colors.dart';
-import '../core/enums/enums.dart';
-import '../viewmodels/auth_viewmodel.dart';
-import 'routes.dart';
 
 class AlimentaPeruApp extends StatelessWidget {
   const AlimentaPeruApp({super.key});

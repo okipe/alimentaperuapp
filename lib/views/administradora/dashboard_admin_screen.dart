@@ -1,15 +1,13 @@
+import 'package:alimenta_peru/app/routes.dart';
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/insumo_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/racion_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../viewmodels/insumo_viewmodel.dart';
-import '../../viewmodels/reserva_viewmodel.dart';
-import '../../viewmodels/racion_viewmodel.dart';
-import '../../app/routes.dart';
-import '../../core/enums/enums.dart';
 
 
 class DashboardAdminScreen extends StatefulWidget {
@@ -137,21 +135,21 @@ class _DashboardAdminScreenState extends State<DashboardAdminScreen> {
 
   Widget _buildModulos(BuildContext context) {
     final modulos = [
-      _Modulo(
+      const _Modulo(
           icon: Icons.inventory_2_outlined,
           label: AppStrings.insumos,
           route: AppRoutes.insumoList,
           color: AppColors.primaryGreen),
-      _Modulo(
+      const _Modulo(
           icon: Icons.restaurant_menu_outlined,
           label: AppStrings.planDiario,
           route: AppRoutes.racionPlan,
           color: AppColors.primaryOrange),
-      _Modulo(
+      const _Modulo(
           icon: Icons.bar_chart_outlined,
           label: AppStrings.reportes,
           route: AppRoutes.reporte,
-          color: const Color(0xFF6366F1)),
+          color: Color(0xFF6366F1)),
     ];
 
     return GridView.count(

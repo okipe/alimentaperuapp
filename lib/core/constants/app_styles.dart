@@ -1,7 +1,6 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-import 'app_colors.dart';
 
 /// Estilos de texto, decoraciones y constantes de diseño reutilizables.
 abstract final class AppStyles {
@@ -114,14 +113,14 @@ abstract final class AppStyles {
       );
 
   // ── Decoraciones de caja ─────────────────────────────────────────────────
-  static BoxDecoration get cardDecoration => BoxDecoration(
+  static BoxDecoration get cardDecoration => const BoxDecoration(
         color: AppColors.cardBackground,
         borderRadius: borderRadiusL,
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowLight,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       );
@@ -146,10 +145,10 @@ abstract final class AppStyles {
 
   // ── Sombras ──────────────────────────────────────────────────────────────
   static List<BoxShadow> get shadowCard => [
-        BoxShadow(
+        const BoxShadow(
           color: AppColors.shadowLight,
           blurRadius: 8,
-          offset: const Offset(0, 2),
+          offset: Offset(0, 2),
         ),
       ];
 

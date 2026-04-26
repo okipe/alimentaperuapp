@@ -1,72 +1,108 @@
+import 'package:alimenta_peru/core/enums/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../core/enums/enums.dart';
-
-/// Entidad de dominio para una donación registrada.
+/// Modelo que representa una donación registrada en el sistema.
+///
+/// Soporta tres tipos de donación mediante [TipoDonacion]:
+/// - **Dinero**: requiere el campo [monto] (mayor a 0).
+/// - **Alimentos**: descripción del producto y cantidad donada.
+/// - **Insumos**: materiales para la operación del comedor.
 class DonacionModel {
+  /// ID único de la donación (documento en Firestore).
   final String id;
+
+  /// ID del usuario con rol [RolUsuario.donante] que realizó la donación.
   final String donanteId;
-  final String nombreDonante;
+
+  /// ID del comedor beneficiario de la donación.
+  final String comedorId;
+
+  /// Tipo de donación: [TipoDonacion.dinero], [TipoDonacion.alimentos]
+  /// o [TipoDonacion.insumos].
   final TipoDonacion tipo;
+
+  /// Descripción detallada de lo donado (producto, cantidad, observaciones).
   final String descripcion;
-  final double? monto; // Solo aplica para TipoDonacion.dinero
-  final String? comprobante; // URL en Firebase Storage
-  final DateTime fechaCreacion;
+
+  /// Monto en soles. Solo aplica cuando [tipo] es [TipoDonacion.dinero].
+  /// Puede ser `null` para donaciones de alimentos o insumos.
+  final double? monto;
+
+  /// Fecha en que se registró la donación.
+  final DateTime fecha;
 
   const DonacionModel({
     required this.id,
     required this.donanteId,
-    required this.nombreDonante,
+    required this.comedorId,
     required this.tipo,
     required this.descripcion,
     this.monto,
-    this.comprobante,
-    required this.fechaCreacion,
+    required this.fecha,
   });
 
-  // ── Firestore ─────────────────────────────────────────────────────────────
-  factory DonacionModel.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    return DonacionModel(
-      id: doc.id,
-      donanteId: data['donanteId'] as String? ?? '',
-      nombreDonante: data['nombreDonante'] as String? ?? '',
-      tipo: TipoDonacionX.fromString(data['tipo'] as String? ?? ''),
-      descripcion: data['descripcion'] as String? ?? '',
-      monto: (data['monto'] as num?)?.toDouble(),
-      comprobante: data['comprobante'] as String?,
-      fechaCreacion:
-          (data['fechaCreacion'] as Timestamp?)?.toDate() ?? DateTime.now(),
-    );
-  }
+  // ── Getters de presentación ───────────────────────────────────────────────
+
+  /// Representación legible del monto para donaciones en dinero.
+  /// Retorna `null` para otros tipos.
+  String? get montoFormateado =>
+      monto != null ? 'S/ ${monto!.toStringAsFixed(2)}' : null;
+
+  // ── Serialización ─────────────────────────────────────────────────────────
 
   Map<String, dynamic> toMap() => {
         'donanteId': donanteId,
-        'nombreDonante': nombreDonante,
+        'comedorId': comedorId,
         'tipo': tipo.name,
         'descripcion': descripcion,
         if (monto != null) 'monto': monto,
-        if (comprobante != null) 'comprobante': comprobante,
-        'fechaCreacion': Timestamp.fromDate(fechaCreacion),
+        'fecha': Timestamp.fromDate(fecha),
       };
+
+  factory DonacionModel.fromMap(Map<String, dynamic> map, String id) {
+    return DonacionModel(
+      id: id,
+      donanteId: map['donanteId'] as String? ?? '',
+      comedorId: map['comedorId'] as String? ?? '',
+      tipo: TipoDonacionX.fromString(map['tipo'] as String? ?? ''),
+      descripcion: map['descripcion'] as String? ?? '',
+      monto: (map['monto'] as num?)?.toDouble(),
+      fecha: (map['fecha'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+
+  /// Constructor alternativo desde un [DocumentSnapshot] de Firestore.
+  factory DonacionModel.fromFirestore(DocumentSnapshot doc) =>
+      DonacionModel.fromMap(doc.data() as Map<String, dynamic>, doc.id);
+
+  // ── copyWith ──────────────────────────────────────────────────────────────
 
   DonacionModel copyWith({
     String? descripcion,
     double? monto,
-    String? comprobante,
+    TipoDonacion? tipo,
   }) =>
       DonacionModel(
         id: id,
         donanteId: donanteId,
-        nombreDonante: nombreDonante,
-        tipo: tipo,
+        comedorId: comedorId,
+        tipo: tipo ?? this.tipo,
         descripcion: descripcion ?? this.descripcion,
         monto: monto ?? this.monto,
-        comprobante: comprobante ?? this.comprobante,
-        fechaCreacion: fechaCreacion,
+        fecha: fecha,
       );
 
   @override
   String toString() =>
-      'DonacionModel(id: $id, tipo: ${tipo.name}, monto: $monto)';
+      'DonacionModel(id: $id, tipo: ${tipo.name}, monto: $montoFormateado)';
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is DonacionModel &&
+          runtimeType == other.runtimeType &&
+          id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

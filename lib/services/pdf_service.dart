@@ -1,18 +1,14 @@
-import 'package:flutter/services.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/enums/enums.dart'; // ← necesario para .label en extensiones
+import 'package:alimenta_peru/models/donacion_model.dart';
+import 'package:alimenta_peru/models/reserva_model.dart';
+import 'package:alimenta_peru/viewmodels/reporte_viewmodel.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
-import '../core/constants/app_strings.dart';
-import '../viewmodels/reporte_viewmodel.dart';
-import '../models/reserva_model.dart';
-import '../models/donacion_model.dart';
-
 /// Servicio de generación y exportación de documentos PDF.
-///
-/// Usa los paquetes `pdf` y `printing` para producir reportes listos
-/// para imprimir o compartir como archivo.
 class PdfService {
   PdfService._();
 
@@ -24,12 +20,7 @@ class PdfService {
   static const _negro = PdfColor.fromInt(0xFF1A1A1A);
 
   // ── Reporte general ───────────────────────────────────────────────────────
-
-  /// Genera y lanza el diálogo de impresión/exportación para el reporte
-  /// consolidado de un período.
-  static Future<void> exportarReporteConsolidado(
-    DatosReporte datos,
-  ) async {
+  static Future<void> exportarReporteConsolidado(DatosReporte datos) async {
     final pdf = pw.Document();
     final fmt = DateFormat('dd/MM/yyyy');
 
@@ -45,7 +36,6 @@ class PdfService {
         footer: (ctx) => _footer(ctx),
         build: (ctx) => [
           pw.SizedBox(height: 16),
-          // KPIs
           pw.Row(children: [
             _kpiBox('Total reservas', '${datos.totalReservas}', _verde),
             pw.SizedBox(width: 8),
@@ -64,11 +54,7 @@ class PdfService {
               _naranja,
             ),
             pw.SizedBox(width: 8),
-            _kpiBox(
-              'Alertas stock',
-              '${datos.insumosConAlerta}',
-              _naranja,
-            ),
+            _kpiBox('Alertas stock', '${datos.insumosConAlerta}', _naranja),
             pw.SizedBox(width: 8),
             _kpiBox(
               'Tasa asistencia',
@@ -95,8 +81,6 @@ class PdfService {
   }
 
   // ── Comprobante de reserva ────────────────────────────────────────────────
-
-  /// Genera un comprobante PDF para una reserva específica.
   static Future<void> exportarComprobanteReserva(ReservaModel reserva) async {
     final pdf = pw.Document();
     final fmt = DateFormat('dd/MM/yyyy HH:mm', 'es');
@@ -112,24 +96,26 @@ class PdfService {
                 titulo: 'Comprobante de Reserva',
                 subtitulo: AppStrings.appName),
             pw.SizedBox(height: 24),
-            _filaInfo('ID de reserva', reserva.id),
-            _filaInfo('Beneficiaria', reserva.nombreUsuario),
+            // ← fix: beneficiariaId en lugar de nombreUsuario (que ya no existe)
+            _filaInfo('ID beneficiaria', reserva.beneficiariaId),
+            // ← fix: estado.name porque .label requiere el import de enums (ya incluido)
             _filaInfo('Estado', reserva.estado.label),
             _filaInfo('Fecha', fmt.format(reserva.fechaCreacion)),
-            if (reserva.fechaRetiro != null)
-              _filaInfo('Retiro', fmt.format(reserva.fechaRetiro!)),
+            _filaInfo('Turno', reserva.turno),
+            _filaInfo('Raciones', '${reserva.numRaciones}'),
+            // ← fix: fechaRetiro ya no existe; horaLimite es el equivalente
+            _filaInfo('Hora límite', fmt.format(reserva.horaLimite)),
             pw.SizedBox(height: 24),
             pw.Center(
               child: pw.Container(
                 padding: const pw.EdgeInsets.all(8),
                 decoration: pw.BoxDecoration(
                   border: pw.Border.all(color: _verde, width: 2),
-                  borderRadius: const pw.BorderRadius.all(
-                    pw.Radius.circular(8),
-                  ),
+                  borderRadius:
+                      const pw.BorderRadius.all(pw.Radius.circular(8)),
                 ),
                 child: pw.Text(
-                  reserva.id,
+                  reserva.codigoQR,
                   style: pw.TextStyle(
                     fontSize: 10,
                     color: _gris,
@@ -150,8 +136,6 @@ class PdfService {
   }
 
   // ── Comprobante de donación ───────────────────────────────────────────────
-
-  /// Genera un comprobante PDF para una donación.
   static Future<void> exportarComprobanteDonacion(
       DonacionModel donacion) async {
     final pdf = pw.Document();
@@ -168,13 +152,15 @@ class PdfService {
                 titulo: 'Comprobante de Donación',
                 subtitulo: AppStrings.appName),
             pw.SizedBox(height: 24),
-            _filaInfo('Donante', donacion.nombreDonante),
+            // ← fix: donanteId en lugar de nombreDonante (que ya no existe)
+            _filaInfo('Donante (ID)', donacion.donanteId),
+            // ← fix: tipo.label con import de enums ya incluido
             _filaInfo('Tipo', donacion.tipo.label),
             _filaInfo('Descripción', donacion.descripcion),
             if (donacion.monto != null)
-              _filaInfo(
-                  'Monto', 'S/ ${donacion.monto!.toStringAsFixed(2)}'),
-            _filaInfo('Fecha', fmt.format(donacion.fechaCreacion)),
+              _filaInfo('Monto', 'S/ ${donacion.monto!.toStringAsFixed(2)}'),
+            // ← fix: donacion.fecha en lugar de donacion.fechaCreacion
+            _filaInfo('Fecha', fmt.format(donacion.fecha)),
             pw.SizedBox(height: 24),
             pw.Center(
               child: pw.Text(
@@ -218,13 +204,13 @@ class PdfService {
                       fontSize: 18,
                       fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 2),
+              // ← fix: PdfColors.white en lugar de PdfColors.white70 (no existe)
               pw.Text(subtitulo,
                   style: const pw.TextStyle(
-                      color: PdfColors.white70, fontSize: 10)),
+                      color: PdfColors.white, fontSize: 10)),
             ],
           ),
-          pw.Text('🥗',
-              style: const pw.TextStyle(fontSize: 28)),
+          pw.Text('🥗', style: const pw.TextStyle(fontSize: 28)),
         ],
       ),
     );
@@ -248,8 +234,7 @@ class PdfService {
         padding: const pw.EdgeInsets.all(10),
         decoration: pw.BoxDecoration(
           color: _fondo,
-          borderRadius:
-              const pw.BorderRadius.all(pw.Radius.circular(8)),
+          borderRadius: const pw.BorderRadius.all(pw.Radius.circular(8)),
           border: pw.Border.all(color: color, width: 1.5),
         ),
         child: pw.Column(
@@ -314,36 +299,30 @@ class PdfService {
         1: const pw.FlexColumnWidth(1),
       },
       children: [
-        // Encabezado
         pw.TableRow(
           decoration: const pw.BoxDecoration(color: _verde),
           children: headers
-              .map(
-                (h) => pw.Padding(
-                  padding: const pw.EdgeInsets.all(6),
-                  child: pw.Text(h,
-                      style: pw.TextStyle(
-                          color: PdfColors.white,
-                          fontWeight: pw.FontWeight.bold,
-                          fontSize: 10)),
-                ),
-              )
+              .map((h) => pw.Padding(
+                    padding: const pw.EdgeInsets.all(6),
+                    child: pw.Text(h,
+                        style: pw.TextStyle(
+                            color: PdfColors.white,
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 10)),
+                  ))
               .toList(),
         ),
-        // Filas de datos
         ...filas.asMap().entries.map(
               (entry) => pw.TableRow(
                 decoration: pw.BoxDecoration(
                   color: entry.key.isEven ? _fondo : PdfColors.white,
                 ),
                 children: entry.value
-                    .map(
-                      (cell) => pw.Padding(
-                        padding: const pw.EdgeInsets.all(6),
-                        child: pw.Text(cell,
-                            style: const pw.TextStyle(fontSize: 10)),
-                      ),
-                    )
+                    .map((cell) => pw.Padding(
+                          padding: const pw.EdgeInsets.all(6),
+                          child: pw.Text(cell,
+                              style: const pw.TextStyle(fontSize: 10)),
+                        ))
                     .toList(),
               ),
             ),

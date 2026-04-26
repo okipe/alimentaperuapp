@@ -1,8 +1,7 @@
-import 'package:flutter_test/flutter_test.dart';
-
-import 'package:alimenta_peru/core/enums/enums.dart';
 import 'package:alimenta_peru/core/constants/app_colors.dart';
 import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   // ── Enums ──────────────────────────────────────────────────────────────

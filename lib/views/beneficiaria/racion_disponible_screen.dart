@@ -1,13 +1,12 @@
+import 'package:alimenta_peru/app/routes.dart';
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/racion_model.dart';
+import 'package:alimenta_peru/viewmodels/racion_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../core/enums/enums.dart';
-import '../../viewmodels/racion_viewmodel.dart';
-import '../../models/racion_model.dart';
-import '../../app/routes.dart';
 
 class RacionDisponibleScreen extends StatefulWidget {
   const RacionDisponibleScreen({super.key});
@@ -161,7 +160,7 @@ class _RacionDisponibleScreenState extends State<RacionDisponibleScreen> {
       mainAxisSpacing: AppStyles.spacingS,
       children: items
           .map((e) => Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.successGreen,
                   borderRadius: AppStyles.borderRadiusM,
                 ),

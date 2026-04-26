@@ -1,13 +1,12 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/donacion_model.dart';
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/donacion_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../core/enums/enums.dart';
-import '../../models/donacion_model.dart';
-import '../../viewmodels/auth_viewmodel.dart';
-import '../../viewmodels/donacion_viewmodel.dart';
 
 class DonacionScreen extends StatefulWidget {
   const DonacionScreen({super.key});
@@ -38,13 +37,13 @@ class _DonacionScreenState extends State<DonacionScreen> {
     final donacion = DonacionModel(
       id: '',
       donanteId: authVM.currentUser?.uid ?? '',
-      nombreDonante: authVM.currentUser?.displayName ?? 'Donante',
+      comedorId: '', // TODO: obtener del perfil del donante
       tipo: _tipoSeleccionado,
       descripcion: _descripcionCtrl.text.trim(),
       monto: _tipoSeleccionado == TipoDonacion.dinero
           ? double.tryParse(_montoCtrl.text)
           : null,
-      fechaCreacion: DateTime.now(),
+      fecha: DateTime.now(),
     );
 
     final ok = await donacionVM.registrarDonacion(donacion);
@@ -54,8 +53,8 @@ class _DonacionScreenState extends State<DonacionScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              donacionVM.errorMessage ?? AppStrings.errorGenerico),
+          content:
+              Text(donacionVM.errorMessage ?? AppStrings.errorGenerico),
           backgroundColor: const Color(0xFFB00020),
         ),
       );
@@ -68,9 +67,7 @@ class _DonacionScreenState extends State<DonacionScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text(AppStrings.nuevaDonacion)),
-      body: _enviado
-          ? _buildExito()
-          : _buildForm(donacionVM),
+      body: _enviado ? _buildExito() : _buildForm(donacionVM),
     );
   }
 
@@ -97,7 +94,8 @@ class _DonacionScreenState extends State<DonacionScreen> {
                         selected: _tipoSeleccionado == tipo,
                         onSelected: (_) =>
                             setState(() => _tipoSeleccionado = tipo),
-                        selectedColor: AppColors.primaryGreen.withOpacity(0.2),
+                        selectedColor:
+                            AppColors.primaryGreen.withValues(alpha: 0.2),
                         labelStyle: AppStyles.bodyMedium.copyWith(
                           color: _tipoSeleccionado == tipo
                               ? AppColors.primaryGreen
@@ -196,7 +194,8 @@ class _DonacionScreenState extends State<DonacionScreen> {
           children: [
             const Text('🙏', style: TextStyle(fontSize: 72)),
             const SizedBox(height: AppStyles.spacingL),
-            Text(AppStrings.graciasDonar, style: AppStyles.headlineMedium,
+            Text(AppStrings.graciasDonar,
+                style: AppStyles.headlineMedium,
                 textAlign: TextAlign.center),
             const SizedBox(height: AppStyles.spacingS),
             Text(

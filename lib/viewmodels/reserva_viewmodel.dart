@@ -1,8 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/reserva_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../core/enums/enums.dart';
-import '../models/reserva_model.dart';
+import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 enum ReservaStatus { idle, loading, success, error }
 
@@ -11,6 +11,7 @@ enum ReservaStatus { idle, loading, success, error }
 /// Cubre crear, confirmar (por QR), cancelar y listar historial.
 class ReservaViewModel extends ChangeNotifier {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+  static const _uuid = Uuid();
 
   ReservaStatus _status = ReservaStatus.idle;
   List<ReservaModel> _reservas = [];
@@ -28,13 +29,13 @@ class ReservaViewModel extends ChangeNotifier {
       _reservaActiva!.estado == EstadoReserva.confirmada;
 
   // ── Cargar reservas de usuario ───────────────────────────────────────────
-  void suscribirAReservas(String usuarioId) {
+  void suscribirAReservas(String beneficiariaId) {
     _status = ReservaStatus.loading;
     notifyListeners();
 
     _db
         .collection('reservas')
-        .where('usuarioId', isEqualTo: usuarioId)
+        .where('beneficiariaId', isEqualTo: beneficiariaId)
         .orderBy('fechaCreacion', descending: true)
         .snapshots()
         .listen(
@@ -47,26 +48,28 @@ class ReservaViewModel extends ChangeNotifier {
         _status = ReservaStatus.success;
         notifyListeners();
       },
-      onError: (e) => _setError('Error al cargar reservas: $e'),
+      onError: (Object e) => _setError('Error al cargar reservas: $e'),
     );
   }
 
   // ── Crear reserva ────────────────────────────────────────────────────────
   Future<bool> crearReserva({
-    required String usuarioId,
-    required String racionId,
-    required String nombreUsuario,
+    required String beneficiariaId,
+    required String menuId,
+    required String comedorId,
+    required String turno,
+    int numRaciones = 1,
   }) async {
     _setLoading();
     try {
-      // Verificar que el usuario no tenga ya una reserva activa hoy
       final hoy = DateTime.now();
       final inicioDelDia = DateTime(hoy.year, hoy.month, hoy.day);
       final finDelDia = inicioDelDia.add(const Duration(days: 1));
 
+      // Verificar que la beneficiaria no tenga una reserva activa hoy
       final existente = await _db
           .collection('reservas')
-          .where('usuarioId', isEqualTo: usuarioId)
+          .where('beneficiariaId', isEqualTo: beneficiariaId)
           .where('estado', isEqualTo: EstadoReserva.confirmada.name)
           .where('fechaCreacion', isGreaterThanOrEqualTo: inicioDelDia)
           .where('fechaCreacion', isLessThan: finDelDia)
@@ -79,11 +82,16 @@ class ReservaViewModel extends ChangeNotifier {
 
       final nuevaReserva = ReservaModel(
         id: '',
-        usuarioId: usuarioId,
-        racionId: racionId,
-        nombreUsuario: nombreUsuario,
+        beneficiariaId: beneficiariaId,
+        menuId: menuId,
+        comedorId: comedorId,
+        fecha: hoy,
+        turno: turno,
+        numRaciones: numRaciones.clamp(1, 3),
         estado: EstadoReserva.confirmada,
-        fechaCreacion: DateTime.now(),
+        codigoQR: _uuid.v4(),
+        horaLimite: DateTime(hoy.year, hoy.month, hoy.day, 23, 59, 0),
+        fechaCreacion: hoy,
       );
 
       await _db.collection('reservas').add(nuevaReserva.toMap());
@@ -102,7 +110,7 @@ class ReservaViewModel extends ChangeNotifier {
     try {
       await _db.collection('reservas').doc(reservaId).update({
         'estado': EstadoReserva.completada.name,
-        'fechaRetiro': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       });
       _status = ReservaStatus.success;
       notifyListeners();

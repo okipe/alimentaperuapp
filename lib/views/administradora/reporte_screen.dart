@@ -1,11 +1,10 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/viewmodels/reporte_viewmodel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../viewmodels/reporte_viewmodel.dart';
+import 'package:provider/provider.dart';
 
 class ReporteScreen extends StatefulWidget {
   const ReporteScreen({super.key});

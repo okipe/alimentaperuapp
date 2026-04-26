@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../core/enums/enums.dart';
+import 'package:flutter/foundation.dart';
 
 enum ReporteStatus { idle, loading, success, error }
 

@@ -1,21 +1,18 @@
+import 'package:alimenta_peru/app/app.dart';
+// NOTA: Descomenta la siguiente línea una vez que hayas ejecutado
+// "flutterfire configure" y generado el archivo firebase_options.dart real.
+import 'package:alimenta_peru/firebase_options.dart';
+// ViewModels
+import 'package:alimenta_peru/viewmodels/auth_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/donacion_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/insumo_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/racion_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/reporte_viewmodel.dart';
+import 'package:alimenta_peru/viewmodels/reserva_viewmodel.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
-
-import 'app/app.dart';
-
-// ViewModels
-import 'viewmodels/auth_viewmodel.dart';
-import 'viewmodels/insumo_viewmodel.dart';
-import 'viewmodels/racion_viewmodel.dart';
-import 'viewmodels/reserva_viewmodel.dart';
-import 'viewmodels/donacion_viewmodel.dart';
-import 'viewmodels/reporte_viewmodel.dart';
-
-// NOTA: Descomenta la siguiente línea una vez que hayas ejecutado
-// "flutterfire configure" y generado el archivo firebase_options.dart real.
-import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

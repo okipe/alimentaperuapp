@@ -1,6 +1,5 @@
+import 'package:alimenta_peru/core/enums/enums.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import '../core/enums/enums.dart';
 
 /// Entidad de dominio que representa un insumo del almacén.
 class InsumoModel {

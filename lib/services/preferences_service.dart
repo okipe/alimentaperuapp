@@ -1,6 +1,5 @@
+import 'package:alimenta_peru/core/enums/enums.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../core/enums/enums.dart';
 
 /// Servicio de almacenamiento local usando SharedPreferences.
 ///

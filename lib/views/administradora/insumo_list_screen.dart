@@ -1,12 +1,11 @@
+import 'package:alimenta_peru/core/constants/app_colors.dart';
+import 'package:alimenta_peru/core/constants/app_strings.dart';
+import 'package:alimenta_peru/core/constants/app_styles.dart';
+import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/models/insumo_model.dart';
+import 'package:alimenta_peru/viewmodels/insumo_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_strings.dart';
-import '../../core/constants/app_styles.dart';
-import '../../core/enums/enums.dart';
-import '../../models/insumo_model.dart';
-import '../../viewmodels/insumo_viewmodel.dart';
 
 class InsumoListScreen extends StatefulWidget {
   const InsumoListScreen({super.key});
