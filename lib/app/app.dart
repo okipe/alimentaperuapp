@@ -120,7 +120,7 @@ class AlimentaPeruApp extends StatelessWidget {
           color: AppColors.textSecondary,
         ),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.cardBackground,
         elevation: 2,
         shadowColor: Colors.black.withOpacity(0.08),
