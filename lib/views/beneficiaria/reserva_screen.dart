@@ -20,42 +20,48 @@ class _ReservaScreenState extends State<ReservaScreen> {
   String? _codigoQR;
 
   Future<void> _onReservar() async {
-    final authVM = context.read<AuthViewModel>();
-    final racionVM = context.read<RacionViewModel>();
-    final reservaVM = context.read<ReservaViewModel>();
+  final authVM = context.read<AuthViewModel>();
+  final racionVM = context.read<RacionViewModel>();
+  final reservaVM = context.read<ReservaViewModel>();
 
-    final uid = authVM.currentUser?.uid;
-    final racion = racionVM.racionDelDia;
+  final uid = authVM.currentUser?.uid;
+  final racion = racionVM.racionDelDia;
 
-    if (uid == null || racion == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No hay ración disponible para reservar')),
-      );
-      return;
-    }
+  // ✅ Obtener comedorId del perfil de la beneficiaria
+  final beneficiaria = authVM.usuario;
+  final comedorId = (beneficiaria != null)
+      ? (beneficiaria as dynamic).comedorId as String? ?? ''
+      : '';
 
-    final ok = await reservaVM.crearReserva(
-      beneficiariaId: uid,
-      menuId: racion.id,
-      comedorId: '', // TODO: obtener del perfil de la beneficiaria
-      turno: 'mañana', // TODO: permitir que la usuaria elija su turno
+  if (uid == null || racion == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('No hay ración disponible para reservar')),
     );
-
-    if (!mounted) return;
-    if (ok) {
-      setState(() {
-        _reservaCreada = true;
-        _codigoQR = reservaVM.reservaActiva?.codigoQR ?? uid;
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(reservaVM.errorMessage ?? AppStrings.errorGenerico),
-          backgroundColor: const Color(0xFFB00020),
-        ),
-      );
-    }
+    return;
   }
+
+  final ok = await reservaVM.crearReserva(
+    beneficiariaId: uid,
+    menuId: racion.id,   // ✅ esto funciona si los menús están en 'raciones'
+    comedorId: comedorId, // ✅ ya no está vacío
+    turno: 'mañana',
+  );
+
+  if (!mounted) return;
+  if (ok) {
+    setState(() {
+      _reservaCreada = true;
+      _codigoQR = reservaVM.reservaActiva?.codigoQR ?? uid;
+    });
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(reservaVM.errorMessage ?? 'Error al crear la reserva'),
+        backgroundColor: const Color(0xFFB00020),
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {

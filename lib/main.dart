@@ -12,6 +12,7 @@ import 'package:alimenta_peru/viewmodels/reserva_viewmodel.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart'; // ← NUEVO
 import 'package:provider/provider.dart';
 import 'package:alimenta_peru/app/providers.dart';
 
@@ -25,9 +26,11 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
+  // Inicializar datos de localización en español ← NUEVO
+  await initializeDateFormatting('es', null); // ← NUEVO
+
   // Inicializar Firebase
-  // NOTA: Reemplaza por DefaultFirebaseOptions.currentPlatform cuando
-  // tengas configurado firebase_options.dart con flutterfire configure.
+  // NOTA: Reemplaza por DefaultFirebaseOptions.currentPlatform cuando tengas configurado firebase_options.dart con flutterfire configure.
   await Firebase.initializeApp(
   options: DefaultFirebaseOptions.currentPlatform,
   );
