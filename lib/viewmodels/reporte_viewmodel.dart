@@ -1,10 +1,10 @@
 import 'package:alimenta_peru/core/enums/enums.dart';
+import 'package:alimenta_peru/services/reporte_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
+import 'package:printing/printing.dart';
 
-enum ReporteStatus { idle, loading, success, error }
-
-/// Datos consolidados para un reporte de período.
+/// Datos consolidados para la vista de reportes.
 class DatosReporte {
   final int totalReservas;
   final int reservasCompletadas;
@@ -31,39 +31,80 @@ class DatosReporte {
       : (reservasCompletadas / totalReservas) * 100;
 }
 
-/// ViewModel de reportes consolidados.
-class ReporteViewModel extends ChangeNotifier {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+enum ReporteStatus { idle, loading, success, error }
 
+/// ViewModel de reportes — capa ViewModel de MVVM.
+///
+/// Expone la API que [ReporteScreen] ya usa:
+/// - [generarReporte()] — consulta Firestore y calcula [DatosReporte].
+/// - [fechaInicio] / [fechaFin] / [setPeriodo] — selector de período.
+/// - [datosReporte] / [isLoading] / [errorMessage]
+///
+/// También ofrece [generarPDF(comedorId)] que delega en [ReporteService]
+/// y abre el visor del sistema con `printing`.
+class ReporteViewModel extends ChangeNotifier {
+  final FirebaseFirestore _db;
+  final ReporteService _reporteService;
+
+  ReporteViewModel({
+    FirebaseFirestore? db,
+    ReporteService? reporteService,
+  })  : _db = db ?? FirebaseFirestore.instance,
+        _reporteService = reporteService ?? ReporteService();
+
+  // ── Estado interno ────────────────────────────────────────────────────────
   ReporteStatus _status = ReporteStatus.idle;
   DatosReporte? _datosReporte;
-  String? _errorMessage;
-  DateTime _fechaInicio = DateTime.now().subtract(const Duration(days: 30));
+  String? _error;
+  DateTime _fechaInicio =
+      DateTime.now().subtract(const Duration(days: 30));
   DateTime _fechaFin = DateTime.now();
 
-  // ── Getters ──────────────────────────────────────────────────────────────
+  // Para el selector de mes del PDF
+  DateTime _mesSeleccionado = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+  );
+
+  // ── Getters públicos ──────────────────────────────────────────────────────
   ReporteStatus get status => _status;
   DatosReporte? get datosReporte => _datosReporte;
-  String? get errorMessage => _errorMessage;
+  String? get errorMessage => _error;
+  String? get error => _error;
   bool get isLoading => _status == ReporteStatus.loading;
+  bool get generando => _status == ReporteStatus.loading;
+
+  // Selector de período (usado por ReporteScreen)
   DateTime get fechaInicio => _fechaInicio;
   DateTime get fechaFin => _fechaFin;
 
-  // ── Selección de período ─────────────────────────────────────────────────
+  // Selector de mes (usado por generarPDF)
+  DateTime get mesSeleccionado => _mesSeleccionado;
+
+  // ── Selector de período ───────────────────────────────────────────────────
+
   void setPeriodo(DateTime inicio, DateTime fin) {
     _fechaInicio = inicio;
     _fechaFin = fin;
     notifyListeners();
   }
 
-  // ── Generar reporte ──────────────────────────────────────────────────────
+  void seleccionarMes(DateTime fecha) {
+    _mesSeleccionado = DateTime(fecha.year, fecha.month);
+    notifyListeners();
+  }
+
+  // ── Generar reporte en pantalla ───────────────────────────────────────────
+
+  /// Consulta Firestore y calcula los [DatosReporte] para el período actual.
+  /// Usado directamente por [ReporteScreen].
   Future<void> generarReporte() async {
     _setLoading();
     try {
-      // Consultar reservas del período
       final snapReservas = await _db
           .collection('reservas')
-          .where('fechaCreacion', isGreaterThanOrEqualTo: _fechaInicio)
+          .where('fechaCreacion',
+              isGreaterThanOrEqualTo: _fechaInicio)
           .where('fechaCreacion', isLessThanOrEqualTo: _fechaFin)
           .get();
 
@@ -75,26 +116,26 @@ class ReporteViewModel extends ChangeNotifier {
         if (estado == EstadoReserva.ausente.name) ausentes++;
       }
 
-      // Consultar donaciones del período
       final snapDonaciones = await _db
           .collection('donaciones')
           .where('tipo', isEqualTo: TipoDonacion.dinero.name)
-          .where('fechaCreacion', isGreaterThanOrEqualTo: _fechaInicio)
+          .where('fechaCreacion',
+              isGreaterThanOrEqualTo: _fechaInicio)
           .where('fechaCreacion', isLessThanOrEqualTo: _fechaFin)
           .get();
 
       double totalDonaciones = 0;
       for (final doc in snapDonaciones.docs) {
-        totalDonaciones += (doc.data()['monto'] as num? ?? 0).toDouble();
+        totalDonaciones +=
+            (doc.data()['monto'] as num? ?? 0).toDouble();
       }
 
-      // Insumos con alerta
       final snapInsumos = await _db.collection('insumos').get();
       int alertas = 0;
       for (final doc in snapInsumos.docs) {
-        final data = doc.data();
-        final actual = (data['cantidadActual'] as num? ?? 0).toDouble();
-        final minimo = (data['cantidadMinima'] as num? ?? 0).toDouble();
+        final d = doc.data();
+        final actual = (d['cantidadActual'] as num? ?? 0).toDouble();
+        final minimo = (d['cantidadMinima'] as num? ?? 0).toDouble();
         if (actual <= minimo) alertas++;
       }
 
@@ -112,26 +153,53 @@ class ReporteViewModel extends ChangeNotifier {
       _status = ReporteStatus.success;
       notifyListeners();
     } catch (e) {
-      _setError('Error al generar reporte: $e');
+      _error = 'Error al generar reporte: $e';
+      _status = ReporteStatus.error;
+      notifyListeners();
+      debugPrint('[ReporteViewModel] generarReporte error: $e');
     }
   }
 
-  // ── Helpers privados ─────────────────────────────────────────────────────
-  void _setLoading() {
-    _status = ReporteStatus.loading;
-    _errorMessage = null;
-    notifyListeners();
+  // ── Generar PDF y abrir visor ─────────────────────────────────────────────
+
+  /// Genera el PDF mensual para [comedorId] y lo abre con el visor del sistema.
+  Future<void> generarPDF(String comedorId) async {
+    if (comedorId.isEmpty) {
+      _error = 'No hay comedor seleccionado.';
+      notifyListeners();
+      return;
+    }
+    _setLoading();
+    try {
+      final bytes =
+          await _reporteService.generarReportePDF(comedorId, _mesSeleccionado);
+      await Printing.layoutPdf(
+        onLayout: (_) async => bytes,
+        name: 'reporte_${comedorId}_${_mesSeleccionado.year}_${_mesSeleccionado.month}.pdf',
+      );
+      _status = ReporteStatus.success;
+      notifyListeners();
+    } catch (e) {
+      _error = 'Error al generar el PDF. Verifica tu conexión.';
+      _status = ReporteStatus.error;
+      notifyListeners();
+      debugPrint('[ReporteViewModel] generarPDF error: $e');
+    }
   }
 
-  void _setError(String msg) {
-    _errorMessage = msg;
-    _status = ReporteStatus.error;
-    notifyListeners();
-  }
+  // ── Limpieza ──────────────────────────────────────────────────────────────
 
   void clearError() {
-    _errorMessage = null;
+    _error = null;
     if (_status == ReporteStatus.error) _status = ReporteStatus.idle;
+    notifyListeners();
+  }
+
+  // ── Helpers privados ──────────────────────────────────────────────────────
+
+  void _setLoading() {
+    _status = ReporteStatus.loading;
+    _error = null;
     notifyListeners();
   }
 }

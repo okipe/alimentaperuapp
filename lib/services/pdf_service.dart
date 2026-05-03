@@ -1,7 +1,8 @@
 import 'package:alimenta_peru/core/constants/app_strings.dart';
-import 'package:alimenta_peru/core/enums/enums.dart'; // ← necesario para .label en extensiones
+import 'package:alimenta_peru/core/enums/enums.dart';
 import 'package:alimenta_peru/models/donacion_model.dart';
 import 'package:alimenta_peru/models/reserva_model.dart';
+// DatosReporte vive en reporte_viewmodel para mantener la cohesión de la capa VM
 import 'package:alimenta_peru/viewmodels/reporte_viewmodel.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -96,14 +97,11 @@ class PdfService {
                 titulo: 'Comprobante de Reserva',
                 subtitulo: AppStrings.appName),
             pw.SizedBox(height: 24),
-            // ← fix: beneficiariaId en lugar de nombreUsuario (que ya no existe)
             _filaInfo('ID beneficiaria', reserva.beneficiariaId),
-            // ← fix: estado.name porque .label requiere el import de enums (ya incluido)
             _filaInfo('Estado', reserva.estado.label),
             _filaInfo('Fecha', fmt.format(reserva.fechaCreacion)),
             _filaInfo('Turno', reserva.turno),
             _filaInfo('Raciones', '${reserva.numRaciones}'),
-            // ← fix: fechaRetiro ya no existe; horaLimite es el equivalente
             _filaInfo('Hora límite', fmt.format(reserva.horaLimite)),
             pw.SizedBox(height: 24),
             pw.Center(
@@ -152,14 +150,11 @@ class PdfService {
                 titulo: 'Comprobante de Donación',
                 subtitulo: AppStrings.appName),
             pw.SizedBox(height: 24),
-            // ← fix: donanteId en lugar de nombreDonante (que ya no existe)
             _filaInfo('Donante (ID)', donacion.donanteId),
-            // ← fix: tipo.label con import de enums ya incluido
             _filaInfo('Tipo', donacion.tipo.label),
             _filaInfo('Descripción', donacion.descripcion),
             if (donacion.monto != null)
               _filaInfo('Monto', 'S/ ${donacion.monto!.toStringAsFixed(2)}'),
-            // ← fix: donacion.fecha en lugar de donacion.fechaCreacion
             _filaInfo('Fecha', fmt.format(donacion.fecha)),
             pw.SizedBox(height: 24),
             pw.Center(
@@ -204,7 +199,6 @@ class PdfService {
                       fontSize: 18,
                       fontWeight: pw.FontWeight.bold)),
               pw.SizedBox(height: 2),
-              // ← fix: PdfColors.white en lugar de PdfColors.white70 (no existe)
               pw.Text(subtitulo,
                   style: const pw.TextStyle(
                       color: PdfColors.white, fontSize: 10)),

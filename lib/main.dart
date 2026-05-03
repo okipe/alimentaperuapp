@@ -13,6 +13,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:alimenta_peru/app/providers.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,17 +32,21 @@ void main() async {
   options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  // runApp(
+  //   MultiProvider(
+  //     providers: [
+  //       ChangeNotifierProvider(create: (_) => AuthViewModel()),
+  //       ChangeNotifierProvider(create: (_) => InsumoViewModel()),
+  //       ChangeNotifierProvider(create: (_) => RacionViewModel()),
+  //       ChangeNotifierProvider(create: (_) => ReservaViewModel()),
+  //       ChangeNotifierProvider(create: (_) => DonacionViewModel()),
+  //       ChangeNotifierProvider(create: (_) => ReporteViewModel()),
+  //     ],
+  //     child: const AlimentaPeruApp(),
+  //   ),
+  // );
+
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthViewModel()),
-        ChangeNotifierProvider(create: (_) => InsumoViewModel()),
-        ChangeNotifierProvider(create: (_) => RacionViewModel()),
-        ChangeNotifierProvider(create: (_) => ReservaViewModel()),
-        ChangeNotifierProvider(create: (_) => DonacionViewModel()),
-        ChangeNotifierProvider(create: (_) => ReporteViewModel()),
-      ],
-      child: const AlimentaPeruApp(),
-    ),
+    buildProviders(child: const AlimentaPeruApp()),
   );
 }
